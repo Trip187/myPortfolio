@@ -3586,6 +3586,32 @@ img.u-pull-left {
         --timeline-left-padding : var(--vspace-1);
     }
 }
+@media screen and (max-width: 768px) {
+
+    /* Stop negative margin issues */
+    .about-info__text {
+        margin-left: 0;
+        padding: var(--vspace-1) 0 0 0;
+    }
+
+    /* Give button breathing room */
+    .about-info__text .btn {
+        margin-bottom: var(--vspace-2);
+        position: static;
+    }
+
+    /* Push Expertise section down */
+    .about-expertise {
+        padding-top: var(--vspace-3);
+    }
+
+    /* Prevent any overlap bleeding */
+    .about-expertise,
+    .about-timelines {
+        clear: both;
+    }
+}
+
 
 
 
