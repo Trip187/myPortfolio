@@ -1551,8 +1551,8 @@ hr.fancy::before {
  * -------------------------------------------------------------------- */
 .lead,
 .attention-getter {
-	position: absolute;
-	left:150px;
+    position    : static !important;
+    left        : auto !important;
     font-family : var(--font-1);
     font-weight : 300;
     font-size   : var(--text-md);
@@ -3434,9 +3434,11 @@ img.u-pull-left {
 }
 
 .about-info__text {
+    position    : static !important;
     padding     : var(--vspace-3_5) 2rem var(--vspace-3) 2rem;
     margin-left : 0;
     margin-bottom : var(--vspace-5);
+    display     : block;
 }
 
 .about-info__text .text-pretitle {
@@ -3453,6 +3455,8 @@ img.u-pull-left {
  * ## about expertise
  * -------------------------------------------------------------------- */
 .about-expertise {
+    position       : static !important;
+    clear          : both;
     padding-top    : calc(6 * var(--space));
     padding-bottom : var(--vspace-2);
     margin-bottom  : var(--vspace-1);
@@ -3478,6 +3482,8 @@ img.u-pull-left {
  * ## about timelines
  * -------------------------------------------------------------------- */
 .about-timelines {
+    position                : static !important;
+    clear                   : both;
     --timeline-left-padding : var(--vspace-1_75);
     --timeline-top-adjust   : var(--vspace-0_5);
     padding-top             : var(--vspace-3);
@@ -3557,7 +3563,14 @@ img.u-pull-left {
  * about
  * ------------------------------------------------------------------- */
 @media screen and (max-width: 1300px) {
+    .about-info {
+        position    : static !important;
+        display     : block;
+    }
+
     .about-info__text {
+        position    : static !important;
+        display     : block;
         padding : var(--vspace-2) 2rem var(--vspace-1_5) 2rem;
         margin-bottom : var(--vspace-4_5);
     }
@@ -3565,6 +3578,8 @@ img.u-pull-left {
 
 @media screen and (max-width: 1200px) {
     .about-info {
+        position    : static !important;
+        display     : block;
         --gutter  : 1.6rem;
         width     : 92%;
         max-width : 800px;
@@ -3572,24 +3587,35 @@ img.u-pull-left {
     }
 
     .about-info__text {
+        position    : static !important;
+        display     : block;
         padding     : var(--vspace-1_5) 1.5rem var(--vspace-2_5) 1.5rem;
         margin-left : 0;
         margin-bottom : var(--vspace-4_5);
     }
 
     .about-expertise {
+        position    : static !important;
+        clear       : both;
+        display     : block;
         margin-top : var(--vspace-5);
     }
 }
 
 @media screen and (max-width: 1000px) {
     .about-timelines {
+        position    : static !important;
+        clear       : both;
+        display     : block;
         --timeline-left-padding : var(--vspace-1_25);
     }
 }
 
 @media screen and (max-width: 800px) {
     .about-timelines {
+        position    : static !important;
+        clear       : both;
+        display     : block;
         --timeline-left-padding : var(--vspace-1_5);
     }
 
@@ -3600,6 +3626,8 @@ img.u-pull-left {
 
 @media screen and (max-width: 600px) {
     .about-info {
+        position    : static !important;
+        display     : block;
         width           : 100%;
         margin-bottom   : var(--vspace-2);
     }
@@ -3622,7 +3650,21 @@ img.u-pull-left {
 
 @media screen and (max-width: 400px) {
     .about-timelines {
+        position    : static !important;
+        clear       : both;
+        display     : block;
         --timeline-left-padding : var(--vspace-1);
+    }
+
+    .about-info {
+        position    : static !important;
+        display     : block;
+    }
+
+    .about-expertise {
+        position    : static !important;
+        clear       : both;
+        display     : block;
     }
 
     .s-works {
@@ -3638,10 +3680,14 @@ img.u-pull-left {
 
     /* Stop negative margin issues */
     .about-info {
+        position    : static !important;
+        display     : block;
         margin-bottom : var(--vspace-2_5);
     }
 
     .about-info__text {
+        position    : static !important;
+        display     : block;
         margin-left: 0;
         margin-bottom: var(--vspace-5);
         padding: var(--vspace-1_5) 1rem var(--vspace-2_5) 1rem;
@@ -3649,18 +3695,26 @@ img.u-pull-left {
 
     /* Download CV button styling at mobile */
     .s-about .row .btn.u-fullwidth2 {
+        position    : static !important;
+        display     : block;
+        width       : 100%;
         margin-top: var(--vspace-2_5);
         margin-bottom: var(--vspace-2);
-        position: static;
     }
 
     /* Push Expertise section down */
     .about-expertise {
+        position    : static !important;
+        clear       : both;
+        display     : block;
         padding-top: var(--vspace-4);
         margin-top: var(--vspace-5);
     }
 
     .about-timelines {
+        position    : static !important;
+        clear       : both;
+        display     : block;
         margin-top: var(--vspace-1_5);
     }
 
