@@ -2089,11 +2089,15 @@ button.u-fullwidth {
 }
 .btn.u-fullwidth2,
 button.u-fullwidth2 {
-	position:relative;
-	left:150px;
-	top:1500px;
     width        : 100%;
     margin-right : 0;
+    margin-bottom : var(--vspace-2);
+    position     : static !important;
+    left         : auto !important;
+    top          : auto !important;
+    transform    : none !important;
+    animation    : none !important;
+    opacity      : 1 !important;
 }
 
 
@@ -3409,7 +3413,12 @@ img.u-pull-left {
     padding-bottom : var(--vspace-3);
 }
 
-/* --------------------------------------------------------------------
+.s-works {
+    padding-top    : var(--vspace-4);
+    padding-bottom : var(--vspace-3);
+}
+
+/* -------------------------------------------------------------------
  * ## about info
  * -------------------------------------------------------------------- */
 .about-info {
@@ -3425,24 +3434,29 @@ img.u-pull-left {
 }
 
 .about-info__text {
-    padding     : var(--vspace-3_5) 10vw var(--vspace-2) 0;
-    margin-left : -4rem;
+    padding     : var(--vspace-3_5) 2rem var(--vspace-3) 2rem;
+    margin-left : 0;
+    margin-bottom : var(--vspace-5);
 }
 
 .about-info__text .text-pretitle {
     margin-bottom : var(--vspace-1);
 }
 
-.about-info__text .btn {
-    margin-top    : var(--vspace-1);
-    margin-bottom : 0;
+/* Download CV button after timelines */
+.s-about .row .btn.u-fullwidth2 {
+    margin-top    : var(--vspace-3);
+    margin-bottom : var(--vspace-2);
 }
 
 /* --------------------------------------------------------------------
  * ## about expertise
  * -------------------------------------------------------------------- */
 .about-expertise {
-    padding-top : calc(6 * var(--space));
+    padding-top    : calc(6 * var(--space));
+    padding-bottom : var(--vspace-2);
+    margin-bottom  : var(--vspace-1);
+    margin-top     : var(--vspace-5);
 }
 
 .about-expertise .skills-list {
@@ -3467,6 +3481,8 @@ img.u-pull-left {
     --timeline-left-padding : var(--vspace-1_75);
     --timeline-top-adjust   : var(--vspace-0_5);
     padding-top             : var(--vspace-3);
+    padding-bottom          : var(--vspace-2);
+    margin-bottom           : var(--vspace-1);
 }
 
 .about-timelines .text-pretitle {
@@ -3542,7 +3558,8 @@ img.u-pull-left {
  * ------------------------------------------------------------------- */
 @media screen and (max-width: 1300px) {
     .about-info__text {
-        padding : var(--vspace-2) 8rem var(--vspace-1_5) 0;
+        padding : var(--vspace-2) 2rem var(--vspace-1_5) 2rem;
+        margin-bottom : var(--vspace-4_5);
     }
 }
 
@@ -3551,11 +3568,17 @@ img.u-pull-left {
         --gutter  : 1.6rem;
         width     : 92%;
         max-width : 800px;
+        margin-bottom : var(--vspace-2);
     }
 
     .about-info__text {
-        padding     : var(--vspace-1) 0 0 0;
+        padding     : var(--vspace-1_5) 1.5rem var(--vspace-2_5) 1.5rem;
         margin-left : 0;
+        margin-bottom : var(--vspace-4_5);
+    }
+
+    .about-expertise {
+        margin-top : var(--vspace-5);
     }
 }
 
@@ -3577,7 +3600,23 @@ img.u-pull-left {
 
 @media screen and (max-width: 600px) {
     .about-info {
-        width : 100%;
+        width           : 100%;
+        margin-bottom   : var(--vspace-2);
+    }
+
+    .s-works {
+        padding-top    : var(--vspace-3);
+        padding-bottom : var(--vspace-2_5);
+    }
+
+    .contact-top {
+        padding-top    : var(--vspace-3);
+        padding-bottom : var(--vspace-1_5);
+    }
+
+    .contact-bottom {
+        padding-top    : var(--vspace-1_5);
+        padding-bottom : var(--vspace-2);
     }
 }
 
@@ -3585,24 +3624,44 @@ img.u-pull-left {
     .about-timelines {
         --timeline-left-padding : var(--vspace-1);
     }
+
+    .s-works {
+        padding-top    : var(--vspace-2_5);
+        padding-bottom : var(--vspace-2);
+    }
+
+    .contact-top {
+        padding-top    : var(--vspace-2_5);
+    }
 }
 @media screen and (max-width: 768px) {
 
     /* Stop negative margin issues */
-    .about-info__text {
-        margin-left: 0;
-        padding: var(--vspace-1) 0 0 0;
+    .about-info {
+        margin-bottom : var(--vspace-2_5);
     }
 
-    /* Give button breathing room */
-    .about-info__text .btn {
+    .about-info__text {
+        margin-left: 0;
+        margin-bottom: var(--vspace-5);
+        padding: var(--vspace-1_5) 1rem var(--vspace-2_5) 1rem;
+    }
+
+    /* Download CV button styling at mobile */
+    .s-about .row .btn.u-fullwidth2 {
+        margin-top: var(--vspace-2_5);
         margin-bottom: var(--vspace-2);
         position: static;
     }
 
     /* Push Expertise section down */
     .about-expertise {
-        padding-top: var(--vspace-3);
+        padding-top: var(--vspace-4);
+        margin-top: var(--vspace-5);
+    }
+
+    .about-timelines {
+        margin-top: var(--vspace-1_5);
     }
 
     /* Prevent any overlap bleeding */
@@ -3622,6 +3681,7 @@ img.u-pull-left {
 .folio-list {
   list-style: none;
   margin-top: var(--vspace-4);
+  margin-bottom: var(--vspace-3);
   margin-left: 0;
 }
 
@@ -3795,6 +3855,8 @@ img.u-pull-left {
  * ------------------------------------------------------------------- */
 .testimonials {
     margin-top : var(--vspace-3);
+    margin-bottom : var(--vspace-3);
+    padding-bottom : var(--vspace-2);
 }
 
 .testimonials .swiper-container {
@@ -3982,8 +4044,9 @@ img.u-pull-left {
  * ------------------------------------------------------------------- */
 
 .contact-top {
-    padding-top : var(--vspace-5);
-    border-top  : 1px solid var(--color-border);
+    padding-top    : var(--vspace-5);
+    padding-bottom : var(--vspace-2);
+    border-top     : 1px solid var(--color-border);
 }
 
 .contact-top .h1 {
@@ -4071,7 +4134,7 @@ img.u-pull-left {
 
 .s-footer {
     margin-top     : auto;
-    padding-top    : var(--vspace-1);
+    padding-top    : var(--vspace-2);
     padding-bottom : var(--vspace-3);
     color          : var(--color-text-light);
 }
