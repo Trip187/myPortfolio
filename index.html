@@ -1,576 +1,1314 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Ian Karari — Full-stack Developer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Ian Karari — full-stack developer and video editor based in Nairobi, Kenya.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink:#0A1220;
-    --panel:#101B2E;
-    --panel-2:#0D1626;
-    --line: rgba(232,236,244,0.09);
-    --text:#E8ECF4;
-    --muted:#8793A8;
-    --signal:#26D9C0;
-    --signal-dim: rgba(38,217,192,0.15);
-    --amber:#FFB454;
-    --radius: 10px;
-    --disp: "Space Grotesk", sans-serif;
-    --body: "Inter", sans-serif;
-    --mono: "JetBrains Mono", monospace;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--ink);
-    color:var(--text);
-    font-family:var(--body);
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  a{color:inherit;text-decoration:none;}
-  ::selection{background:var(--signal);color:var(--ink);}
-
-  /* faint grid texture on the background */
-  body::before{
-    content:"";
-    position:fixed;inset:0;
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size:64px 64px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%);
-    pointer-events:none;
-    z-index:0;
-  }
-
-  /* scroll progress rail */
-  .rail{
-    position:fixed; left:0; top:0; bottom:0; width:3px;
-    background:transparent; z-index:60;
-  }
-  .rail__fill{
-    width:100%; height:0%;
-    background:linear-gradient(var(--signal), var(--amber));
-    box-shadow:0 0 12px var(--signal);
-    transition:height .1s linear;
-  }
-
-  .wrap{max-width:1120px;margin:0 auto;padding:0 32px;position:relative;z-index:1;}
-
-  /* nav */
-  header.nav{
-    position:sticky; top:0; z-index:50;
-    backdrop-filter:blur(10px);
-    background:rgba(10,18,32,0.75);
-    border-bottom:1px solid var(--line);
-  }
-  .nav__inner{
-    max-width:1120px;margin:0 auto;padding:18px 32px;
-    display:flex;align-items:center;justify-content:space-between;
-  }
-  .nav__brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:14px;letter-spacing:.02em;}
-  .dot-live{width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 8px var(--signal);animation:pulse 2s ease-in-out infinite;flex:none;}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-  .nav__links{display:flex;gap:28px;font-family:var(--mono);font-size:13px;color:var(--muted);}
-  .nav__links a{padding:4px 2px;border-bottom:1px solid transparent;transition:color .2s, border-color .2s;}
-  .nav__links a:hover, .nav__links a.active{color:var(--signal);border-color:var(--signal);}
-  .nav__toggle{display:none;background:none;border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 12px;border-radius:6px;}
-
-  @media (max-width:760px){
-    .nav__links{display:none;}
-    .nav__toggle{display:block;}
-  }
-
-  section{padding:120px 0;border-bottom:1px solid var(--line);position:relative;}
-  section:last-of-type{border-bottom:none;}
-  .eyebrow{
-    font-family:var(--mono);font-size:12.5px;color:var(--signal);
-    letter-spacing:.08em;text-transform:uppercase;
-    display:flex;align-items:center;gap:10px;margin-bottom:18px;
-  }
-  .eyebrow::before{content:"";width:22px;height:1px;background:var(--signal);}
-
-  h1,h2,h3,h4{font-family:var(--disp);font-weight:600;margin:0;}
-
-  /* ---------- HERO ---------- */
-  .hero{padding-top:96px;padding-bottom:80px;overflow:hidden;}
-  .hero__grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;}
-  @media (max-width:880px){.hero__grid{grid-template-columns:1fr;}}
-
-  .terminal-line{
-    font-family:var(--mono);font-size:14px;color:var(--muted);
-    margin-bottom:22px;display:flex;gap:2px;
-  }
-  .terminal-line .prompt{color:var(--signal);}
-  .terminal-line .caret{display:inline-block;width:8px;background:var(--signal);margin-left:2px;animation:blink 1s step-end infinite;}
-  @keyframes blink{50%{opacity:0}}
-
-  .hero h1{font-size:clamp(38px,5.2vw,64px);line-height:1.08;letter-spacing:-0.01em;}
-  .hero h1 .accent{color:var(--signal);}
-  .hero p.lede{color:var(--muted);font-size:17px;max-width:46ch;margin-top:22px;}
-
-  .hero__cta{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap;}
-  .btn{
-    font-family:var(--mono);font-size:13.5px;padding:13px 22px;border-radius:7px;
-    border:1px solid var(--line);transition:all .2s;
-  }
-  .btn--solid{background:var(--signal);color:var(--ink);border-color:var(--signal);font-weight:500;}
-  .btn--solid:hover{background:var(--amber);border-color:var(--amber);}
-  .btn--ghost{color:var(--text);}
-  .btn--ghost:hover{border-color:var(--signal);color:var(--signal);}
-
-  /* signal trace graphic */
-  .trace{width:100%;height:auto;}
-  .trace text{font-family:var(--mono);fill:var(--muted);font-size:11px;}
-  .trace .node{fill:var(--panel);stroke:var(--line);stroke-width:1.5;}
-  .trace .node.active{stroke:var(--signal);}
-  .trace .node-label{fill:var(--text);font-family:var(--mono);font-size:12px;}
-  .trace path.path{fill:none;stroke:var(--line);stroke-width:2;}
-  .trace path.pulse{fill:none;stroke:var(--signal);stroke-width:2;stroke-dasharray:6 220;stroke-dashoffset:0;filter:drop-shadow(0 0 4px var(--signal));animation:travel 3.2s linear infinite;}
-  @keyframes travel{to{stroke-dashoffset:-452;}}
-
-  /* ---------- ABOUT ---------- */
-  .about__grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;}
-  @media (max-width:880px){.about__grid{grid-template-columns:1fr;gap:36px;}}
-  .about p{color:var(--muted);font-size:16px;margin:0 0 16px;}
-  .about strong{color:var(--text);font-weight:600;}
-
-  .stat-row{display:flex;gap:36px;margin-top:36px;flex-wrap:wrap;}
-  .stat b{display:block;font-family:var(--disp);font-size:30px;color:var(--signal);}
-  .stat span{font-family:var(--mono);font-size:12px;color:var(--muted);}
-
-  /* ---------- EXPERTISE (endpoints) ---------- */
-  .endpoint-group{margin-bottom:34px;}
-  .endpoint-group h4{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:500;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em;}
-  .pill-row{display:flex;flex-wrap:wrap;gap:10px;}
-  .pill{
-    font-family:var(--mono);font-size:12.5px;color:var(--text);
-    border:1px solid var(--line);padding:7px 13px;border-radius:5px;
-    background:var(--panel);transition:border-color .2s, color .2s, transform .15s;
-  }
-  .pill:hover{border-color:var(--signal);color:var(--signal);transform:translateY(-2px);}
-
-  /* ---------- WORKS ---------- */
-  .work-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
-  @media (max-width:760px){.work-grid{grid-template-columns:1fr;}}
-  .work-card{
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    overflow:hidden;transition:border-color .2s;
-  }
-  .work-card:hover{border-color:var(--signal);}
-  .work-card video{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;background:#000;}
-  .work-card__body{padding:20px 22px 24px;}
-  .work-card__head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;}
-  .work-card__head h4{font-size:16.5px;}
-  .work-card__head a{font-family:var(--mono);font-size:12px;color:var(--signal);white-space:nowrap;}
-  .work-card__head a:hover{color:var(--amber);}
-  .work-card__desc{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;}
-
-  /* ---------- TIMELINE ---------- */
-  .tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;}
-  @media (max-width:880px){.tl-grid{grid-template-columns:1fr;gap:48px;}}
-  .tl-item{position:relative;padding-left:26px;border-left:1px solid var(--line);padding-bottom:32px;}
-  .tl-item:last-child{padding-bottom:0;}
-  .tl-item::before{
-    content:"";position:absolute;left:-4.5px;top:4px;width:8px;height:8px;
-    border-radius:50%;background:var(--panel);border:2px solid var(--signal);
-  }
-  .tl-item h4{font-size:16.5px;margin-bottom:4px;}
-  .tl-item .meta{font-family:var(--mono);font-size:12px;color:var(--signal);margin-bottom:10px;display:block;}
-  .tl-item p{color:var(--muted);font-size:14.5px;margin:0;}
-
-  /* ---------- TESTIMONIALS (transmissions) ---------- */
-  .log-card{
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    padding:26px 28px;margin-bottom:16px;
-  }
-  .log-card__head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:6px;}
-  .log-card__head strong{font-family:var(--disp);font-size:15.5px;}
-  .log-card__head span{font-family:var(--mono);font-size:11.5px;color:var(--muted);}
-  .log-card p{margin:0;color:var(--text);font-size:15px;}
-  .log-tag{font-family:var(--mono);font-size:10.5px;color:var(--signal);background:var(--signal-dim);padding:2px 8px;border-radius:4px;}
-
-  /* ---------- CONTACT ---------- */
-  .contact-panel{
-    background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:52px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;
-  }
-  @media (max-width:760px){.contact-panel{grid-template-columns:1fr;padding:32px;}}
-  .contact-panel h2{font-size:clamp(26px,3.6vw,36px);line-height:1.15;}
-  .contact-panel p{color:var(--muted);margin-top:14px;}
-  .contact-list{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:14.5px;}
-  .contact-list li{padding:12px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;}
-  .contact-list li:last-child{border-bottom:none;}
-  .contact-list span:first-child{color:var(--muted);}
-  .contact-list a:hover{color:var(--signal);}
-
-  footer{padding:36px 0;font-family:var(--mono);font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;}
-
-  /* reveal on scroll */
-  [data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
-  [data-reveal].is-visible{opacity:1;transform:translateY(0);}
-  @media (prefers-reduced-motion:reduce){
-    [data-reveal]{opacity:1;transform:none;transition:none;}
-    .trace .pulse{animation:none;}
-    .dot-live{animation:none;}
-  }
-</style>
-</head>
-<body>
-
-<div class="rail"><div class="rail__fill" id="railFill"></div></div>
-
-<header class="nav">
-  <div class="nav__inner">
-    <div class="nav__brand"><span class="dot-live"></span> ian_karari</div>
-    <nav class="nav__links">
-      <a href="#about">about</a>
-      <a href="#expertise">stack</a>
-      <a href="#works">work</a>
-      <a href="#experience">experience</a>
-      <a href="#testimonials">notes</a>
-      <a href="#contact">contact</a>
-    </nav>
-    <button class="nav__toggle" onclick="document.querySelector('.nav__links').style.display='flex'">menu</button>
-  </div>
-</header>
-
-<main>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="wrap hero__grid">
-      <div>
-        <div class="terminal-line"><span class="prompt">ian@nairobi</span>:~$&nbsp;<span id="typed"></span><span class="caret">&nbsp;</span></div>
-        <h1>Full-stack developer<br>& <span class="accent">video editor</span><br>based in Kenya.</h1>
-        <p class="lede">I build things end to end — interfaces, servers, and the databases underneath them — then edit the story around them. Currently deep in Node.js, Express, and cloud infrastructure, with one eye on cybersecurity.</p>
-        <div class="hero__cta">
-          <a href="#contact" class="btn btn--solid">Say hello</a>
-          <a href="#works" class="btn btn--ghost">See work</a>
-          <a href="./Ian_Karari_Resume.pdf" class="btn btn--ghost" download>↓ Download CV</a>
-        </div>
-      </div>
-      <div>
-        <svg class="trace" viewBox="0 0 360 320" xmlns="http://www.w3.org/2000/svg">
-          <path class="path" d="M60,40 C160,40 60,150 180,150 C300,150 200,260 300,260"></path>
-          <path class="pulse" d="M60,40 C160,40 60,150 180,150 C300,150 200,260 300,260"></path>
-          <circle class="node active" cx="60" cy="40" r="7"></circle>
-          <text class="node-label" x="76" y="44">design</text>
-          <circle class="node" cx="180" cy="150" r="7"></circle>
-          <text class="node-label" x="196" y="154">build</text>
-          <circle class="node" cx="300" cy="260" r="7"></circle>
-          <text class="node-label" x="252" y="288">ship</text>
-        </svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="wrap about__grid">
-      <div data-reveal>
-        <div class="eyebrow">01 · About</div>
-        <h2 style="font-size:clamp(24px,3vw,32px);margin-bottom:18px;">Bridging design and backend, deliberately.</h2>
-      </div>
-      <div data-reveal>
-        <p>I'm a web developer and IT specialist working across <strong>full-stack development</strong>, <strong>UI/UX design</strong>, and <strong>infrastructure</strong> — the kind of person who's equally comfortable in Figma and in a production database.</p>
-        <p>My technical base spans HTML5, CSS3, JavaScript, React.js and Node.js, backed by design tools like Figma and Adobe Suite, plus the operational side: SEO, performance tuning, DNS, and email authentication. I've delivered projects at WIMCY Productions, Motown, and Kingsoft Company Limited.</p>
-        <p>Whether it's a responsive front end, a tuned server, or infrastructure that just stays up — I aim for solutions that are actually production-ready, not just demo-ready.</p>
-        <div class="stat-row">
-          <div class="stat"><b>3+</b><span>Companies served</span></div>
-          <div class="stat"><b>15+</b><span>Frameworks & platforms</span></div>
-          <div class="stat"><b>KE</b><span>Based in Nairobi</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPERTISE -->
-  <section id="expertise">
-    <div class="wrap">
-      <div class="eyebrow" data-reveal>02 · Stack</div>
-      <h2 style="font-size:clamp(24px,3vw,32px);margin-bottom:40px;" data-reveal>Every layer, covered.</h2>
-
-      <div class="endpoint-group" data-reveal>
-        <h4>Frontend</h4>
-        <div class="pill-row">
-          <span class="pill">HTML5</span><span class="pill">CSS3</span><span class="pill">JavaScript</span>
-          <span class="pill">React.js</span><span class="pill">Next.js</span><span class="pill">Redux</span>
-          <span class="pill">Bootstrap</span><span class="pill">Tailwind CSS</span>
-        </div>
-      </div>
-
-      <div class="endpoint-group" data-reveal>
-        <h4>Backend</h4>
-        <div class="pill-row">
-          <span class="pill">Node.js</span><span class="pill">Express.js</span><span class="pill">Flatiron</span>
-          <span class="pill">RESTful APIs</span><span class="pill">Java</span><span class="pill">PHP</span>
-        </div>
-      </div>
-
-      <div class="endpoint-group" data-reveal>
-        <h4>Data & cloud</h4>
-        <div class="pill-row">
-          <span class="pill">MySQL</span><span class="pill">MongoDB</span><span class="pill">Mongoose</span>
-          <span class="pill">CouchDB</span><span class="pill">Firebase</span><span class="pill">Firestore</span>
-          <span class="pill">Aiven</span><span class="pill">IBM Cloud</span>
-        </div>
-      </div>
-
-      <div class="endpoint-group" data-reveal>
-        <h4>Ops & tooling</h4>
-        <div class="pill-row">
-          <span class="pill">Git</span><span class="pill">GitHub</span><span class="pill">GitLab</span>
-          <span class="pill">DNS</span><span class="pill">SSL Certificates</span><span class="pill">Cloudflare</span>
-          <span class="pill">cPanel</span><span class="pill">SPF/DKIM/DMARC</span><span class="pill">Zapier</span>
-        </div>
-      </div>
-
-      <div class="endpoint-group" data-reveal>
-        <h4>Design & platforms</h4>
-        <div class="pill-row">
-          <span class="pill">Figma</span><span class="pill">Adobe XD</span><span class="pill">Photoshop</span>
-          <span class="pill">Premiere Pro</span><span class="pill">Canva</span><span class="pill">Webflow</span>
-          <span class="pill">Shopify</span><span class="pill">WordPress</span><span class="pill">Framer</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WORKS -->
-  <section id="works">
-    <div class="wrap">
-      <div class="eyebrow" data-reveal>03 · Recent work</div>
-      <h2 style="font-size:clamp(24px,3vw,32px);margin-bottom:14px;" data-reveal>Projects, in motion.</h2>
-      <p class="lede" style="color:var(--muted);margin-bottom:40px;" data-reveal>A few things I've shipped lately — click through to any of them.</p>
-
-      <div class="work-grid" data-reveal>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="retail-hub.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>Retail Store Website</h4><a href="https://retailhub-1dnt.onrender.com/" target="_blank" rel="noopener">visit ↗</a></div>
-            <div class="work-card__desc">Node · Express · SQL · Bootstrap · Render · Aiven · jQuery</div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="nodeBlog.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>Node.js Blog</h4><a href="https://nodeblogsite.onrender.com" target="_blank" rel="noopener">visit ↗</a></div>
-            <div class="work-card__desc">Node.js · Express.js · MongoDB · Mongoose</div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="footballLive5.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>React Football Live App</h4><a href="https://trip187.github.io/Football-live/" target="_blank" rel="noopener">visit ↗</a></div>
-            <div class="work-card__desc">React · APIs · JSON · React-Bootstrap · Context API</div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="footballLive.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>Sports Streaming Website</h4><a href="https://trip187.github.io/wfms/" target="_blank" rel="noopener">visit ↗</a></div>
-            <div class="work-card__desc">HTML · CSS · XML · JavaScript · RSS · APIs</div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="cool-blog.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>Cool Blog App</h4><a href="https://trip187.github.io/cool-blog/" target="_blank" rel="noopener">visit ↗</a></div>
-            <div class="work-card__desc">React · Redux · React Router · Firebase · Google Auth</div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="Framer.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>Framer Site</h4><a href="https://movify254.framer.website/" target="_blank" rel="noopener">visit ↗</a></div>
-            <div class="work-card__desc">Framer · Motion design</div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <video poster="pic1.jpg" controls muted playsinline preload="metadata">
-            <source src="wordpress.mp4" type="video/mp4">
-          </video>
-          <div class="work-card__body">
-            <div class="work-card__head"><h4>WordPress + React + PHP + Vite</h4></div>
-            <div class="work-card__desc">WordPress · React · PHP · Vite</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPERIENCE + EDUCATION -->
-  <section id="experience">
-    <div class="wrap tl-grid">
-      <div>
-        <div class="eyebrow" data-reveal>04 · Experience</div>
-        <div data-reveal>
-          <div class="tl-item">
-            <h4>Web Developer — WIMCY Productions</h4>
-            <span class="meta">May 2025 – Oct 2025</span>
-            <p>Designed and maintained responsive sites with HTML5, CSS3, JavaScript, React.js and Node.js. Built landing pages, optimized UI for campaigns, and produced visual/video content alongside editorial and marketing teams.</p>
-          </div>
-          <div class="tl-item">
-            <h4>IT Support Engineer / Web Developer — Motown</h4>
-            <span class="meta">Jan 2024 – May 2025</span>
-            <p>Managed domain setup, DNS, and SSL via GoDaddy and Render. Configured SPF/DKIM/DMARC, applied SEO improvements, and ensured cross-browser compatibility across Chrome, Firefox, Safari and Edge.</p>
-          </div>
-          <div class="tl-item">
-            <h4>IT Expert — Kingsoft Company Limited</h4>
-            <span class="meta">Nov 2020 – Jan 2024</span>
-            <p>Improved UI/UX with Photoshop, XD and CSS3. Implemented caching and image optimization for faster delivery, trained staff on tooling, and maintained company hardware, software, and networks.</p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="eyebrow" data-reveal>04 · Education</div>
-        <div data-reveal>
-          <div class="tl-item">
-            <h4>United States International University (USIU-A)</h4>
-            <span class="meta">Nairobi, Kenya</span>
-            <p>Coursework spanning software development fundamentals, systems, and applied computing.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section id="testimonials">
-    <div class="wrap">
-      <div class="eyebrow" data-reveal>05 · Notes from collaborators</div>
-      <h2 style="font-size:clamp(24px,3vw,32px);margin-bottom:36px;" data-reveal>Incoming transmissions.</h2>
-
-      <div data-reveal>
-        <div class="log-card">
-          <div class="log-card__head"><strong>Margaret Wanjiru</strong><span class="log-tag">Director, Effective Enterprises</span></div>
-          <p>An enthusiastic, hardworking developer who completes tasks in a timely manner.</p>
-        </div>
-        <div class="log-card">
-          <div class="log-card__head"><strong>Jack Wanjala</strong><span class="log-tag">Director, MELLOT Africa Ltd</span></div>
-          <p>His calm demeanor when faced with unexpected challenges was greatly appreciated — the entire process was completed on schedule.</p>
-        </div>
-        <div class="log-card">
-          <div class="log-card__head"><strong>George Kingori</strong><span class="log-tag">CEO, Kingsoft Technologies</span></div>
-          <p>His proactive approach to improving our systems has been truly valued. The troubleshooting guides and internal FAQs he compiled have already prevented numerous common support requests, empowering our users here in Kenya to solve problems independently.</p>
-        </div>
-        <div class="log-card">
-          <div class="log-card__head"><strong>Cynthia Nduta</strong><span class="log-tag">Administration Manager, AIVEO</span></div>
-          <p>His dedication to outstanding user support has been consistently commended. His ability to simplify complex solutions has made him a highly regarded member of the team.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="wrap">
-      <div class="contact-panel" data-reveal>
-        <div>
-          <div class="eyebrow">06 · Get in touch</div>
-          <h2>Open a channel — I reply fast.</h2>
-          <p>Have a project, a question, or just want to talk shop about design, tech, and infrastructure? Reach out.</p>
-        </div>
-        <ul class="contact-list">
-          <li><span>email</span><a href="mailto:iangkarari@gmail.com">iangkarari@gmail.com</a></li>
-          <li><span>phone</span><a href="tel:+254728887485">+254 728 887 485</a></li>
-          <li><span>linkedin</span><a href="https://www.linkedin.com/in/ian-karari-5324a2183/" target="_blank" rel="noopener">ian-karari</a></li>
-          <li><span>github</span><a href="#0">github.com/Trip187</a></li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<footer class="wrap">
-  <span>© Ian Karari, 2026</span>
-  <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ back to top</a>
-</footer>
-
-<script>
-  // scroll progress rail
-  const fill = document.getElementById('railFill');
-  window.addEventListener('scroll', () => {
-    const h = document.documentElement;
-    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
-    fill.style.height = pct + '%';
-  });
-
-  // active nav link
-  const links = document.querySelectorAll('.nav__links a');
-  const sections = [...links].map(l => document.querySelector(l.getAttribute('href')));
-  const navObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if(e.isIntersecting){
-        links.forEach(l => l.classList.remove('active'));
-        const idx = sections.indexOf(e.target);
-        if(idx > -1) links[idx].classList.add('active');
+  <head>
+    <meta charset="utf-8" />
+    <title>Ian Karari — Full-stack Developer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Ian Karari — full-stack developer and video editor based in Nairobi, Kenya."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0a1220;
+        --panel: #101b2e;
+        --panel-2: #0d1626;
+        --line: rgba(232, 236, 244, 0.09);
+        --text: #e8ecf4;
+        --muted: #8793a8;
+        --signal: #26d9c0;
+        --signal-dim: rgba(38, 217, 192, 0.15);
+        --amber: #ffb454;
+        --radius: 10px;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "Inter", sans-serif;
+        --mono: "JetBrains Mono", monospace;
       }
-    });
-  }, {rootMargin:'-40% 0px -50% 0px'});
-  sections.forEach(s => s && navObserver.observe(s));
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--ink);
+        color: var(--text);
+        font-family: var(--body);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      ::selection {
+        background: var(--signal);
+        color: var(--ink);
+      }
 
-  // reveal on scroll
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if(e.isIntersecting){ e.target.classList.add('is-visible'); revealObserver.unobserve(e.target); }
-    });
-  }, {threshold:0.15});
-  document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
+      /* faint grid texture on the background */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          black 30%,
+          transparent 75%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
 
-  // typed terminal effect
-  const phrases = ["whoami", "full-stack developer", "video editor", "learning to break things safely"];
-  const typedEl = document.getElementById('typed');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduceMotion){
-    typedEl.textContent = phrases[1];
-  } else {
-    let pi = 0, ci = 0, deleting = false;
-    function tick(){
-      const word = phrases[pi];
-      if(!deleting){
-        ci++;
-        typedEl.textContent = word.slice(0, ci);
-        if(ci === word.length){ deleting = true; setTimeout(tick, 1200); return; }
+      /* scroll progress rail */
+      .rail {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: transparent;
+        z-index: 60;
+      }
+      .rail__fill {
+        width: 100%;
+        height: 0%;
+        background: linear-gradient(var(--signal), var(--amber));
+        box-shadow: 0 0 12px var(--signal);
+        transition: height 0.1s linear;
+      }
+
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 32px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* nav */
+      header.nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(10px);
+        background: rgba(10, 18, 32, 0.75);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav__inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 18px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav__brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-family: var(--mono);
+        font-size: 14px;
+        letter-spacing: 0.02em;
+      }
+      .dot-live {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--signal);
+        box-shadow: 0 0 8px var(--signal);
+        animation: pulse 2s ease-in-out infinite;
+        flex: none;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+      .nav__links {
+        display: flex;
+        gap: 28px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .nav__links a {
+        padding: 4px 2px;
+        border-bottom: 1px solid transparent;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .nav__links a:hover,
+      .nav__links a.active {
+        color: var(--signal);
+        border-color: var(--signal);
+      }
+      .nav__toggle {
+        display: none;
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 8px 12px;
+        border-radius: 6px;
+      }
+
+      @media (max-width: 760px) {
+        .nav__links {
+          display: none;
+        }
+        .nav__toggle {
+          display: block;
+        }
+      }
+
+      section {
+        padding: 120px 0;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+      }
+      section:last-of-type {
+        border-bottom: none;
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--signal);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 22px;
+        height: 1px;
+        background: var(--signal);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--disp);
+        font-weight: 600;
+        margin: 0;
+      }
+
+      /* ---------- HERO ---------- */
+      .hero {
+        padding-top: 96px;
+        padding-bottom: 80px;
+        overflow: hidden;
+      }
+      .hero__grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 56px;
+        align-items: center;
+      }
+      @media (max-width: 880px) {
+        .hero__grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .terminal-line {
+        font-family: var(--mono);
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 22px;
+        display: flex;
+        gap: 2px;
+      }
+      .terminal-line .prompt {
+        color: var(--signal);
+      }
+      .terminal-line .caret {
+        display: inline-block;
+        width: 8px;
+        background: var(--signal);
+        margin-left: 2px;
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .hero h1 {
+        font-size: clamp(38px, 5.2vw, 64px);
+        line-height: 1.08;
+        letter-spacing: -0.01em;
+      }
+      .hero h1 .accent {
+        color: var(--signal);
+      }
+      .hero p.lede {
+        color: var(--muted);
+        font-size: 17px;
+        max-width: 46ch;
+        margin-top: 22px;
+      }
+
+      .hero__cta {
+        display: flex;
+        gap: 14px;
+        margin-top: 34px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        font-family: var(--mono);
+        font-size: 13.5px;
+        padding: 13px 22px;
+        border-radius: 7px;
+        border: 1px solid var(--line);
+        transition: all 0.2s;
+      }
+      .btn--solid {
+        background: var(--signal);
+        color: var(--ink);
+        border-color: var(--signal);
+        font-weight: 500;
+      }
+      .btn--solid:hover {
+        background: var(--amber);
+        border-color: var(--amber);
+      }
+      .btn--ghost {
+        color: var(--text);
+      }
+      .btn--ghost:hover {
+        border-color: var(--signal);
+        color: var(--signal);
+      }
+
+      /* signal trace graphic */
+      .trace {
+        width: 100%;
+        height: auto;
+      }
+      .trace text {
+        font-family: var(--mono);
+        fill: var(--muted);
+        font-size: 11px;
+      }
+      .trace .node {
+        fill: var(--panel);
+        stroke: var(--line);
+        stroke-width: 1.5;
+      }
+      .trace .node.active {
+        stroke: var(--signal);
+      }
+      .trace .node-label {
+        fill: var(--text);
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      .trace path.path {
+        fill: none;
+        stroke: var(--line);
+        stroke-width: 2;
+      }
+      .trace path.pulse {
+        fill: none;
+        stroke: var(--signal);
+        stroke-width: 2;
+        stroke-dasharray: 6 220;
+        stroke-dashoffset: 0;
+        filter: drop-shadow(0 0 4px var(--signal));
+        animation: travel 3.2s linear infinite;
+      }
+      @keyframes travel {
+        to {
+          stroke-dashoffset: -452;
+        }
+      }
+
+      /* ---------- ABOUT ---------- */
+      .about__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+      }
+      @media (max-width: 880px) {
+        .about__grid {
+          grid-template-columns: 1fr;
+          gap: 36px;
+        }
+      }
+      .about p {
+        color: var(--muted);
+        font-size: 16px;
+        margin: 0 0 16px;
+      }
+      .about strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .stat-row {
+        display: flex;
+        gap: 36px;
+        margin-top: 36px;
+        flex-wrap: wrap;
+      }
+      .stat b {
+        display: block;
+        font-family: var(--disp);
+        font-size: 30px;
+        color: var(--signal);
+      }
+      .stat span {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* ---------- EXPERTISE (endpoints) ---------- */
+      .endpoint-group {
+        margin-bottom: 34px;
+      }
+      .endpoint-group h4 {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 500;
+        margin-bottom: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--text);
+        border: 1px solid var(--line);
+        padding: 7px 13px;
+        border-radius: 5px;
+        background: var(--panel);
+        transition:
+          border-color 0.2s,
+          color 0.2s,
+          transform 0.15s;
+      }
+      .pill:hover {
+        border-color: var(--signal);
+        color: var(--signal);
+        transform: translateY(-2px);
+      }
+
+      /* ---------- WORKS ---------- */
+      .work-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+      @media (max-width: 760px) {
+        .work-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .work-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: border-color 0.2s;
+      }
+      .work-card:hover {
+        border-color: var(--signal);
+      }
+      .work-card video {
+        width: 100%;
+        display: block;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        background: #000;
+      }
+      .work-card__body {
+        padding: 20px 22px 24px;
+      }
+      .work-card__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .work-card__head h4 {
+        font-size: 16.5px;
+      }
+      .work-card__head a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--signal);
+        white-space: nowrap;
+      }
+      .work-card__head a:hover {
+        color: var(--amber);
+      }
+      .work-card__desc {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      /* ---------- TIMELINE ---------- */
+      .tl-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+      }
+      @media (max-width: 880px) {
+        .tl-grid {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+      }
+      .tl-item {
+        position: relative;
+        padding-left: 26px;
+        border-left: 1px solid var(--line);
+        padding-bottom: 32px;
+      }
+      .tl-item:last-child {
+        padding-bottom: 0;
+      }
+      .tl-item::before {
+        content: "";
+        position: absolute;
+        left: -4.5px;
+        top: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--panel);
+        border: 2px solid var(--signal);
+      }
+      .tl-item h4 {
+        font-size: 16.5px;
+        margin-bottom: 4px;
+      }
+      .tl-item .meta {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--signal);
+        margin-bottom: 10px;
+        display: block;
+      }
+      .tl-item p {
+        color: var(--muted);
+        font-size: 14.5px;
+        margin: 0;
+      }
+
+      /* ---------- TESTIMONIALS (transmissions) ---------- */
+      .log-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px 28px;
+        margin-bottom: 16px;
+      }
+      .log-card__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .log-card__head strong {
+        font-family: var(--disp);
+        font-size: 15.5px;
+      }
+      .log-card__head span {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .log-card p {
+        margin: 0;
+        color: var(--text);
+        font-size: 15px;
+      }
+      .log-tag {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--signal);
+        background: var(--signal-dim);
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+
+      /* ---------- CONTACT ---------- */
+      .contact-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 52px;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+      }
+      @media (max-width: 760px) {
+        .contact-panel {
+          grid-template-columns: 1fr;
+          padding: 32px;
+        }
+      }
+      .contact-panel h2 {
+        font-size: clamp(26px, 3.6vw, 36px);
+        line-height: 1.15;
+      }
+      .contact-panel p {
+        color: var(--muted);
+        margin-top: 14px;
+      }
+      .contact-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-family: var(--mono);
+        font-size: 14.5px;
+      }
+      .contact-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+      }
+      .contact-list li:last-child {
+        border-bottom: none;
+      }
+      .contact-list span:first-child {
+        color: var(--muted);
+      }
+      .contact-list a:hover {
+        color: var(--signal);
+      }
+
+      footer {
+        padding: 36px 0;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* reveal on scroll */
+      [data-reveal] {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+      [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        [data-reveal] {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+        .trace .pulse {
+          animation: none;
+        }
+        .dot-live {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="rail"><div class="rail__fill" id="railFill"></div></div>
+
+    <header class="nav">
+      <div class="nav__inner">
+        <div class="nav__brand"><span class="dot-live"></span> ian_karari</div>
+        <nav class="nav__links">
+          <a href="#about">about</a>
+          <a href="#expertise">stack</a>
+          <a href="#works">work</a>
+          <a href="#experience">experience</a>
+          <a href="#testimonials">notes</a>
+          <a href="#contact">contact</a>
+        </nav>
+        <button
+          class="nav__toggle"
+          onclick="document.querySelector('.nav__links').style.display = 'flex'"
+        >
+          menu
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero">
+        <div class="wrap hero__grid">
+          <div>
+            <div class="terminal-line">
+              <span class="prompt">ian@nairobi</span>:~$&nbsp;<span
+                id="typed"
+              ></span
+              ><span class="caret">&nbsp;</span>
+            </div>
+            <h1>
+              Full-stack developer<br />&
+              <span class="accent">video editor</span><br />based in Kenya.
+            </h1>
+            <p class="lede">
+              I build things end to end — interfaces, servers, and the databases
+              underneath them — then edit the story around them. Currently deep
+              in Node.js, Express, and cloud infrastructure, with one eye on
+              cybersecurity.
+            </p>
+            <div class="hero__cta">
+              <a href="#contact" class="btn btn--solid">Say hello</a>
+              <a href="#works" class="btn btn--ghost">See work</a>
+              <a href="./Ian_Karari_Resume.pdf" class="btn btn--ghost" download
+                >↓ Download CV</a
+              >
+            </div>
+          </div>
+          <div>
+            <svg
+              class="trace"
+              viewBox="0 0 360 320"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class="path"
+                d="M60,40 C160,40 60,150 180,150 C300,150 200,260 300,260"
+              ></path>
+              <path
+                class="pulse"
+                d="M60,40 C160,40 60,150 180,150 C300,150 200,260 300,260"
+              ></path>
+              <circle class="node active" cx="60" cy="40" r="7"></circle>
+              <text class="node-label" x="76" y="44">design</text>
+              <circle class="node" cx="180" cy="150" r="7"></circle>
+              <text class="node-label" x="196" y="154">build</text>
+              <circle class="node" cx="300" cy="260" r="7"></circle>
+              <text class="node-label" x="252" y="288">ship</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about">
+        <div class="wrap about__grid">
+          <div data-reveal>
+            <div class="eyebrow">01 · About</div>
+            <h2 style="font-size: clamp(24px, 3vw, 32px); margin-bottom: 18px">
+              Bridging design and backend, deliberately.
+            </h2>
+          </div>
+          <div data-reveal>
+            <p>
+              I'm a web developer and IT specialist working across
+              <strong>full-stack development</strong>,
+              <strong>UI/UX design</strong>, and
+              <strong>infrastructure</strong> — the kind of person who's equally
+              comfortable in Figma and in a production database.
+            </p>
+            <p>
+              My technical base spans HTML5, CSS3, JavaScript, React.js and
+              Node.js, backed by design tools like Figma and Adobe Suite, plus
+              the operational side: SEO, performance tuning, DNS, and email
+              authentication. I've delivered projects at WIMCY Productions,
+              Motown, and Kingsoft Company Limited.
+            </p>
+            <p>
+              Whether it's a responsive front end, a tuned server, or
+              infrastructure that just stays up — I aim for solutions that are
+              actually production-ready, not just demo-ready.
+            </p>
+            <div class="stat-row">
+              <div class="stat"><b>3+</b><span>Companies served</span></div>
+              <div class="stat">
+                <b>15+</b><span>Frameworks & platforms</span>
+              </div>
+              <div class="stat"><b>KE</b><span>Based in Nairobi</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPERTISE -->
+      <section id="expertise">
+        <div class="wrap">
+          <div class="eyebrow" data-reveal>02 · Stack</div>
+          <h2
+            style="font-size: clamp(24px, 3vw, 32px); margin-bottom: 40px"
+            data-reveal
+          >
+            Every layer, covered.
+          </h2>
+
+          <div class="endpoint-group" data-reveal>
+            <h4>Frontend</h4>
+            <div class="pill-row">
+              <span class="pill">HTML5</span><span class="pill">CSS3</span
+              ><span class="pill">JavaScript</span>
+              <span class="pill">React.js</span><span class="pill">Next.js</span
+              ><span class="pill">Redux</span>
+              <span class="pill">Bootstrap</span
+              ><span class="pill">Tailwind CSS</span>
+            </div>
+          </div>
+
+          <div class="endpoint-group" data-reveal>
+            <h4>Backend</h4>
+            <div class="pill-row">
+              <span class="pill">Node.js</span
+              ><span class="pill">Express.js</span
+              ><span class="pill">Flatiron</span>
+              <span class="pill">RESTful APIs</span
+              ><span class="pill">Java</span><span class="pill">PHP</span>
+            </div>
+          </div>
+
+          <div class="endpoint-group" data-reveal>
+            <h4>Data & cloud</h4>
+            <div class="pill-row">
+              <span class="pill">MySQL</span><span class="pill">MongoDB</span
+              ><span class="pill">Mongoose</span>
+              <span class="pill">CouchDB</span><span class="pill">Firebase</span
+              ><span class="pill">Firestore</span>
+              <span class="pill">Aiven</span><span class="pill">IBM Cloud</span>
+            </div>
+          </div>
+
+          <div class="endpoint-group" data-reveal>
+            <h4>Ops & tooling</h4>
+            <div class="pill-row">
+              <span class="pill">Git</span><span class="pill">GitHub</span
+              ><span class="pill">GitLab</span> <span class="pill">DNS</span
+              ><span class="pill">SSL Certificates</span
+              ><span class="pill">Cloudflare</span>
+              <span class="pill">cPanel</span
+              ><span class="pill">SPF/DKIM/DMARC</span
+              ><span class="pill">Zapier</span>
+            </div>
+          </div>
+
+          <div class="endpoint-group" data-reveal>
+            <h4>Design & platforms</h4>
+            <div class="pill-row">
+              <span class="pill">Figma</span><span class="pill">Adobe XD</span
+              ><span class="pill">Photoshop</span>
+              <span class="pill">Premiere Pro</span
+              ><span class="pill">Canva</span><span class="pill">Webflow</span>
+              <span class="pill">Shopify</span
+              ><span class="pill">WordPress</span
+              ><span class="pill">Framer</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKS -->
+      <section id="works">
+        <div class="wrap">
+          <div class="eyebrow" data-reveal>03 · Recent work</div>
+          <h2
+            style="font-size: clamp(24px, 3vw, 32px); margin-bottom: 14px"
+            data-reveal
+          >
+            Projects, in motion.
+          </h2>
+          <p
+            class="lede"
+            style="color: var(--muted); margin-bottom: 40px"
+            data-reveal
+          >
+            A few things I've shipped lately — click through to any of them.
+          </p>
+
+          <div class="work-grid" data-reveal>
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="retail-hub.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>Retail Store Website</h4>
+                  <a
+                    href="https://retailhub-1dnt.onrender.com/"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">
+                  Node · Express · SQL · Bootstrap · Render · Aiven · jQuery
+                </div>
+              </div>
+            </div>
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="todo.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>TO-DO App</h4>
+                  <a
+                    href="https://to-do-app-c7nh.onrender.com"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">
+                  Node · Express · couchDB · Bootstrap · Render .IBM Cloudant
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="nodeBlog.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>Node.js Blog</h4>
+                  <a
+                    href="https://nodeblogsite.onrender.com"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">
+                  Node.js · Express.js · MongoDB · Mongoose
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="footballLive5.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>React Football Live App</h4>
+                  <a
+                    href="https://trip187.github.io/Football-live/"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">
+                  React · APIs · JSON · React-Bootstrap · Context API
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="footballLive.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>Sports Streaming Website</h4>
+                  <a
+                    href="https://trip187.github.io/wfms/"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">
+                  HTML · CSS · XML · JavaScript · RSS · APIs
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="cool-blog.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>Cool Blog App</h4>
+                  <a
+                    href="https://trip187.github.io/cool-blog/"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">
+                  React · Redux · React Router · Firebase · Google Auth
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="Framer.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>Framer Site</h4>
+                  <a
+                    href="https://movify254.framer.website/"
+                    target="_blank"
+                    rel="noopener"
+                    >visit ↗</a
+                  >
+                </div>
+                <div class="work-card__desc">Framer · Motion design</div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <video
+                poster="pic1.jpg"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="wordpress.mp4" type="video/mp4" />
+              </video>
+              <div class="work-card__body">
+                <div class="work-card__head">
+                  <h4>WordPress + React + PHP + Vite</h4>
+                </div>
+                <div class="work-card__desc">
+                  WordPress · React · PHP · Vite
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPERIENCE + EDUCATION -->
+      <section id="experience">
+        <div class="wrap tl-grid">
+          <div>
+            <div class="eyebrow" data-reveal>04 · Experience</div>
+            <div data-reveal>
+              <div class="tl-item">
+                <h4>Web Developer — WIMCY Productions</h4>
+                <span class="meta">May 2025 – Oct 2025</span>
+                <p>
+                  Designed and maintained responsive sites with HTML5, CSS3,
+                  JavaScript, React.js and Node.js. Built landing pages,
+                  optimized UI for campaigns, and produced visual/video content
+                  alongside editorial and marketing teams.
+                </p>
+              </div>
+              <div class="tl-item">
+                <h4>IT Support Engineer / Web Developer — Motown</h4>
+                <span class="meta">Jan 2024 – May 2025</span>
+                <p>
+                  Managed domain setup, DNS, and SSL via GoDaddy and Render.
+                  Configured SPF/DKIM/DMARC, applied SEO improvements, and
+                  ensured cross-browser compatibility across Chrome, Firefox,
+                  Safari and Edge.
+                </p>
+              </div>
+              <div class="tl-item">
+                <h4>IT Expert — Kingsoft Company Limited</h4>
+                <span class="meta">Nov 2020 – Jan 2024</span>
+                <p>
+                  Improved UI/UX with Photoshop, XD and CSS3. Implemented
+                  caching and image optimization for faster delivery, trained
+                  staff on tooling, and maintained company hardware, software,
+                  and networks.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="eyebrow" data-reveal>04 · Education</div>
+            <div data-reveal>
+              <div class="tl-item">
+                <h4>United States International University (USIU-A)</h4>
+                <span class="meta">Nairobi, Kenya</span>
+                <p>
+                  Coursework spanning software development fundamentals,
+                  systems, and applied computing.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section id="testimonials">
+        <div class="wrap">
+          <div class="eyebrow" data-reveal>05 · Notes from collaborators</div>
+          <h2
+            style="font-size: clamp(24px, 3vw, 32px); margin-bottom: 36px"
+            data-reveal
+          >
+            Incoming transmissions.
+          </h2>
+
+          <div data-reveal>
+            <div class="log-card">
+              <div class="log-card__head">
+                <strong>Margaret Wanjiru</strong
+                ><span class="log-tag">Director, Effective Enterprises</span>
+              </div>
+              <p>
+                An enthusiastic, hardworking developer who completes tasks in a
+                timely manner.
+              </p>
+            </div>
+            <div class="log-card">
+              <div class="log-card__head">
+                <strong>Jack Wanjala</strong
+                ><span class="log-tag">Director, MELLOT Africa Ltd</span>
+              </div>
+              <p>
+                His calm demeanor when faced with unexpected challenges was
+                greatly appreciated — the entire process was completed on
+                schedule.
+              </p>
+            </div>
+            <div class="log-card">
+              <div class="log-card__head">
+                <strong>George Kingori</strong
+                ><span class="log-tag">CEO, Kingsoft Technologies</span>
+              </div>
+              <p>
+                His proactive approach to improving our systems has been truly
+                valued. The troubleshooting guides and internal FAQs he compiled
+                have already prevented numerous common support requests,
+                empowering our users here in Kenya to solve problems
+                independently.
+              </p>
+            </div>
+            <div class="log-card">
+              <div class="log-card__head">
+                <strong>Cynthia Nduta</strong
+                ><span class="log-tag">Administration Manager, AIVEO</span>
+              </div>
+              <p>
+                His dedication to outstanding user support has been consistently
+                commended. His ability to simplify complex solutions has made
+                him a highly regarded member of the team.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact">
+        <div class="wrap">
+          <div class="contact-panel" data-reveal>
+            <div>
+              <div class="eyebrow">06 · Get in touch</div>
+              <h2>Open a channel — I reply fast.</h2>
+              <p>
+                Have a project, a question, or just want to talk shop about
+                design, tech, and infrastructure? Reach out.
+              </p>
+            </div>
+            <ul class="contact-list">
+              <li>
+                <span>email</span
+                ><a href="mailto:iangkarari@gmail.com">iangkarari@gmail.com</a>
+              </li>
+              <li>
+                <span>phone</span
+                ><a href="tel:+254728887485">+254 728 887 485</a>
+              </li>
+              <li>
+                <span>linkedin</span
+                ><a
+                  href="https://www.linkedin.com/in/ian-karari-5324a2183/"
+                  target="_blank"
+                  rel="noopener"
+                  >ian-karari</a
+                >
+              </li>
+              <li><span>github</span><a href="#0">github.com/Trip187</a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      <span>© Ian Karari, 2026</span>
+      <a
+        href="#top"
+        onclick="
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return false;
+        "
+        >↑ back to top</a
+      >
+    </footer>
+
+    <script>
+      // scroll progress rail
+      const fill = document.getElementById("railFill");
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement;
+        const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+        fill.style.height = pct + "%";
+      });
+
+      // active nav link
+      const links = document.querySelectorAll(".nav__links a");
+      const sections = [...links].map((l) =>
+        document.querySelector(l.getAttribute("href")),
+      );
+      const navObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              links.forEach((l) => l.classList.remove("active"));
+              const idx = sections.indexOf(e.target);
+              if (idx > -1) links[idx].classList.add("active");
+            }
+          });
+        },
+        { rootMargin: "-40% 0px -50% 0px" },
+      );
+      sections.forEach((s) => s && navObserver.observe(s));
+
+      // reveal on scroll
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("is-visible");
+              revealObserver.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document
+        .querySelectorAll("[data-reveal]")
+        .forEach((el) => revealObserver.observe(el));
+
+      // typed terminal effect
+      const phrases = [
+        "whoami",
+        "full-stack developer",
+        "video editor",
+        "learning to break things safely",
+      ];
+      const typedEl = document.getElementById("typed");
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (reduceMotion) {
+        typedEl.textContent = phrases[1];
       } else {
-        ci--;
-        typedEl.textContent = word.slice(0, ci);
-        if(ci === 0){ deleting = false; pi = (pi+1) % phrases.length; }
+        let pi = 0,
+          ci = 0,
+          deleting = false;
+        function tick() {
+          const word = phrases[pi];
+          if (!deleting) {
+            ci++;
+            typedEl.textContent = word.slice(0, ci);
+            if (ci === word.length) {
+              deleting = true;
+              setTimeout(tick, 1200);
+              return;
+            }
+          } else {
+            ci--;
+            typedEl.textContent = word.slice(0, ci);
+            if (ci === 0) {
+              deleting = false;
+              pi = (pi + 1) % phrases.length;
+            }
+          }
+          setTimeout(tick, deleting ? 40 : 70);
+        }
+        tick();
       }
-      setTimeout(tick, deleting ? 40 : 70);
-    }
-    tick();
-  }
-</script>
-
-</body>
+    </script>
+  </body>
 </html>
